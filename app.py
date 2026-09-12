@@ -1153,7 +1153,6 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             <div class="node-banner node-banner-jam">
               <div class="node-banner-text">
                 <div class="node-banner-title">
-                  <span style="font-size:1.05rem;flex-shrink:0;">⚡</span>
                   <span>Jammer (ECM Threat Node)</span>
                 </div>
                 <div class="node-banner-subtitle">Adversary Electronic Attack & Interference</div>
@@ -1217,14 +1216,14 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
 
             cj_btn1, cj_btn2 = st.columns(2)
             with cj_btn1:
-                if st.button("⚡ Emit Jam", type="primary", use_container_width=True, key="arch_node_btn_emit"):
+                if st.button("Emit Jam", type="primary", use_container_width=True, key="arch_node_btn_emit"):
                     orch.config.jam_power = float(sel_jam_power)
                     orch.channel.config.jam_power = float(sel_jam_power)
                     orch.set_jam(JamProfile(sel_profile), sel_targets)
                     st.session_state.last = orch.step()
                     st.rerun()
             with cj_btn2:
-                if st.button("⏹️ Silence Jam", use_container_width=True, key="arch_node_btn_clear"):
+                if st.button("Silence Jam", use_container_width=True, key="arch_node_btn_clear"):
                     orch.clear_jam()
                     st.session_state.last = orch.step()
                     st.rerun()
@@ -1287,7 +1286,6 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             <div class="node-banner node-banner-rx">
               <div class="node-banner-text">
                 <div class="node-banner-title">
-                  <span style="font-size:1.05rem;flex-shrink:0;">📡</span>
                   <span>Receiver (ES Sensing Node)</span>
                 </div>
                 <div class="node-banner-subtitle">Electronic Support Spectrum Surveillance</div>
@@ -1339,7 +1337,6 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             <div class="node-banner node-banner-tx">
               <div class="node-banner-text">
                 <div class="node-banner-title">
-                  <span style="font-size:1.05rem;flex-shrink:0;">🛰️</span>
                   <span>Transmitter (ECCM Actuator)</span>
                 </div>
                 <div class="node-banner-subtitle">Adaptive RF Radiator & Attached Recommender</div>
@@ -1377,7 +1374,7 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             <div class="ml-attached-card" style="border:1.5px solid rgba(39,174,96,0.45);border-left:4px solid #27ae60;border-radius:8px;padding:0.75rem 0.85rem;background:{'rgba(39,174,96,0.06)' if not dark else 'rgba(39,174,96,0.12)'};margin-top:0.4rem;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;">
                 <div class="ml-attached-title" style="margin-bottom:0;color:#27ae60;">
-                  <span style="font-size:0.95rem;">⚡</span> Attached ML Policy (MLP Recommender)
+                  Attached ML Policy (MLP Recommender)
                 </div>
                 <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;padding:0.15rem 0.45rem;border-radius:3px;background:rgba(39,174,96,0.15);color:#27ae60;font-weight:700;border:1px solid rgba(39,174,96,0.35);">
                   NEURAL ENGINE
@@ -1461,7 +1458,6 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
         <div class="node-banner node-banner-decision">
           <div class="node-banner-text">
             <div class="node-banner-title">
-              <span style="font-size:1.05rem;flex-shrink:0;">🧠</span>
               <span>Cognitive Decision Engine — Full Explainability Trace</span>
             </div>
             <div class="node-banner-subtitle">Autonomous Closed-Loop Sense &rarr; Recommend &rarr; Safety Gate &rarr; Actuate</div>
@@ -1652,7 +1648,7 @@ def main() -> None:
                     st.rerun()
         else:
             st.markdown("---")
-            st.caption("ℹ️ **Jammer controls** (profile, power, target channels, and triggers) are integrated directly inside the **Jammer Node**.")
+            st.caption("**Jammer controls** (profile, power, target channels, and triggers) are integrated directly inside the **Jammer Node**.")
 
         st.markdown("---")
         st.markdown("### Run control")
