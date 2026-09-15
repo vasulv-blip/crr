@@ -8,6 +8,7 @@ Run from this directory:
 
 from __future__ import annotations
 
+import base64
 import html
 from pathlib import Path
 import sys
@@ -302,27 +303,53 @@ div[data-testid="stTable"] td {{
   border: 1px solid {t['hero_border']};
   background: {t['hero_bg']};
   border-radius: 8px;
-  padding: 1.55rem 1.35rem 1.25rem 1.35rem;
+  padding: 1.25rem 1.45rem;
   margin-top: 0.75rem;
   margin-bottom: 1.15rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: {"0 2px 10px rgba(0, 0, 0, 0.04)" if not dark else "0 4px 16px rgba(0, 0, 0, 0.35)"};
 }}
-.hero-kicker {{
-  color: {t['hero_kicker']};
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  margin: 0 0 0.55rem 0;
+.hero-content {{
+  flex: 1 1 auto;
+  min-width: 0;
 }}
 .hero-title {{
   color: {t['hero_title']};
   font-size: 1.55rem;
   font-weight: 650;
   margin: 0;
+  line-height: 1.25;
 }}
 .hero-sub {{
   color: {t['hero_sub']};
-  margin-top: 0.35rem;
-  font-size: 0.95rem;
+  margin-top: 0.40rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}}
+.hero-brand {{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}}
+.hero-logo-card {{
+  background: #ffffff;
+  padding: 0.45rem 0.90rem;
+  border-radius: 8px;
+  border: 1px solid {"#d5dee7" if not dark else "rgba(255, 255, 255, 0.22)"};
+  box-shadow: {"0 2px 8px rgba(0, 0, 0, 0.06)" if not dark else "0 4px 16px rgba(0, 0, 0, 0.45)"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}}
+.hero-logo-img {{
+  display: block;
+  height: 42px;
+  width: auto;
+  object-fit: contain;
 }}
 .panel {{
   background: {t['panel']};
@@ -400,11 +427,11 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="transmitter"]) {
   overflow: hidden !important;
 }}
 div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
-  border: 1.5px solid {"rgba(142, 68, 173, 0.45)" if not dark else "rgba(155, 89, 182, 0.4)"} !important;
-  border-top: 4px solid #8e44ad !important;
+  border: 1.5px solid {"rgba(51, 65, 85, 0.40)" if not dark else "rgba(148, 163, 184, 0.30)"} !important;
+  border-top: 4px solid {"#334155" if not dark else "#94a3b8"} !important;
   border-radius: 9px !important;
   background-color: {t['panel']} !important;
-  box-shadow: 0 4px 14px {"rgba(142, 68, 173, 0.08)" if not dark else "rgba(0, 0, 0, 0.4)"} !important;
+  box-shadow: 0 4px 14px {"rgba(30, 41, 59, 0.08)" if not dark else "rgba(0, 0, 0, 0.4)"} !important;
   overflow: hidden !important;
 }}
 
@@ -412,7 +439,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
 .node-banner {{
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.85rem;
   padding: 0.65rem 0.85rem;
   border-radius: 7px;
@@ -421,6 +448,13 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
   min-width: 0;
   box-sizing: border-box;
 }}
+.node-banner-main {{
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}}
 .node-banner-text {{
   flex: 1 1 auto;
   min-width: 0;
@@ -428,8 +462,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
 .node-banner-badge {{
   flex: 0 0 auto;
   white-space: nowrap !important;
-  align-self: flex-start;
-  margin-top: 0.1rem;
+  align-self: center;
 }}
 .node-banner-jam {{
   background: {"linear-gradient(135deg, rgba(231, 76, 60, 0.16) 0%, rgba(192, 57, 43, 0.06) 100%)" if not dark else "linear-gradient(135deg, rgba(192, 57, 43, 0.35) 0%, rgba(35, 18, 22, 0.7) 100%)"};
@@ -447,20 +480,18 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
   border-left: 5px solid #27ae60;
 }}
 .node-banner-decision {{
-  background: {"linear-gradient(135deg, rgba(155, 89, 182, 0.16) 0%, rgba(142, 68, 173, 0.06) 100%)" if not dark else "linear-gradient(135deg, rgba(142, 68, 173, 0.35) 0%, rgba(32, 18, 42, 0.7) 100%)"};
-  border: 1px solid {"#d2b4de" if not dark else "#6c3483"};
-  border-left: 5px solid #8e44ad;
+  background: {"linear-gradient(135deg, rgba(51, 65, 85, 0.12) 0%, rgba(30, 41, 59, 0.04) 100%)" if not dark else "linear-gradient(135deg, rgba(51, 65, 85, 0.40) 0%, rgba(15, 23, 42, 0.70) 100%)"};
+  border: 1px solid {"#cbd5e1" if not dark else "#334155"};
+  border-left: 5px solid {"#334155" if not dark else "#94a3b8"};
 }}
 
 .node-banner-title {{
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.90rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  line-height: 1.25;
 }}
 .node-banner-jam .node-banner-title {{
   color: {"#922b21" if not dark else "#f1948a"};
@@ -472,7 +503,42 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
   color: {"#1e8449" if not dark else "#82e0aa"};
 }}
 .node-banner-decision .node-banner-title {{
-  color: {"#6c3483" if not dark else "#bb8fce"};
+  color: {"#0f172a" if not dark else "#f8fafc"};
+}}
+
+.node-icon-badge {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}}
+.node-icon-badge svg,
+.node-icon-badge img {{
+  display: block;
+}}
+.node-icon-badge-jam {{
+  background: {"rgba(192, 57, 43, 0.14)" if not dark else "rgba(231, 76, 60, 0.25)"};
+  color: {"#c0392b" if not dark else "#f1948a"};
+  border: 1.5px solid {"rgba(192, 57, 43, 0.35)" if not dark else "rgba(231, 76, 60, 0.45)"};
+}}
+.node-icon-badge-rx {{
+  background: {"rgba(41, 128, 185, 0.14)" if not dark else "rgba(52, 152, 219, 0.25)"};
+  color: {"#2980b9" if not dark else "#85c1e9"};
+  border: 1.5px solid {"rgba(41, 128, 185, 0.35)" if not dark else "rgba(52, 152, 219, 0.45)"};
+}}
+.node-icon-badge-tx {{
+  background: {"rgba(39, 174, 96, 0.14)" if not dark else "rgba(46, 204, 113, 0.25)"};
+  color: {"#27ae60" if not dark else "#82e0aa"};
+  border: 1.5px solid {"rgba(39, 174, 96, 0.35)" if not dark else "rgba(46, 204, 113, 0.45)"};
+}}
+.node-icon-badge-decision {{
+  background: {"rgba(51, 65, 85, 0.12)" if not dark else "rgba(148, 163, 184, 0.18)"};
+  color: {"#1e293b" if not dark else "#e2e8f0"};
+  border: 1.5px solid {"rgba(51, 65, 85, 0.35)" if not dark else "rgba(148, 163, 184, 0.38)"};
 }}
 
 .node-banner-subtitle {{
@@ -481,6 +547,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
   font-weight: 500;
   margin-top: 0.12rem;
   letter-spacing: 0.02em;
+  line-height: 1.2;
 }}
 
 .node-card {{
@@ -500,7 +567,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node="decision"]) {{
   border-top: 4px solid #27ae60;
 }}
 .node-card-decision {{
-  border-top: 4px solid #8e44ad;
+  border-top: 4px solid {"#334155" if not dark else "#94a3b8"};
 }}
 .node-header-row {{
   display: flex;
@@ -929,6 +996,25 @@ def render_channel_map(observations: list[dict], tx_channel: int, dark: bool) ->
                     st.markdown(card, unsafe_allow_html=True)
 
 
+def _svg_data_uri(svg_code: str) -> str:
+    b64 = base64.b64encode(svg_code.strip().encode("utf-8")).decode("ascii")
+    return f"data:image/svg+xml;base64,{b64}"
+
+
+def _get_logo_data_uri() -> str:
+    candidates = [
+        ROOT / "assets" / "eage_logo_hires.png",
+        ROOT / "assets" / "eage_logo_cropped.png",
+        ROOT / "assets" / "eage_logo.png",
+    ]
+    for p in candidates:
+        if p.exists():
+            data = p.read_bytes()
+            b64 = base64.b64encode(data).decode("ascii")
+            return f"data:image/png;base64,{b64}"
+    return ""
+
+
 def _html_block(content: str) -> None:
     compact = " ".join(line.strip() for line in content.splitlines() if line.strip())
     if hasattr(st, "html"):
@@ -1140,6 +1226,67 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
     ml_pred_ch, ml_pred_inc, ml_conf = _get_ml_prediction(orch, last)
     ml_pred_text = f"Recommend CH{ml_pred_ch}" if ml_pred_ch is not None else ("Advise Increase Power" if ml_pred_inc else "Hold")
 
+    # Professional defense/aero-grade vector SVG icons
+    clr_jam = "#c0392b" if not dark else "#f1948a"
+    clr_rx = "#2980b9" if not dark else "#85c1e9"
+    clr_tx = "#27ae60" if not dark else "#82e0aa"
+    clr_decision = "#1e293b" if not dark else "#e2e8f0"
+
+    svg_jam = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        f'stroke="{clr_jam}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        f'<path d="M4.93 4.93a10 10 0 0 1 14.14 0"/>'
+        f'<path d="M7.76 7.76a6 6 0 0 1 8.48 0"/>'
+        f'<circle cx="12" cy="12" r="2.5" fill="{clr_jam}"/>'
+        f'<line x1="2" y1="2" x2="22" y2="22"/>'
+        f'</svg>'
+    )
+    svg_rx = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        f'stroke="{clr_rx}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        f'<path d="M4 10a7.31 7.31 0 0 0 10 10Z"/>'
+        f'<path d="m9 15 3-3 1 1-3 3Z"/>'
+        f'<path d="M17 13a6 6 0 0 0-6-6"/>'
+        f'<path d="M21 13A10 10 0 0 0 11 3"/>'
+        f'</svg>'
+    )
+    svg_tx = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        f'stroke="{clr_tx}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        f'<path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9"/>'
+        f'<path d="M7.8 13.2a6 6 0 0 1 0-8.5"/>'
+        f'<circle cx="12" cy="9" r="2" fill="{clr_tx}"/>'
+        f'<path d="M16.2 4.8a6 6 0 0 1 0 8.5"/>'
+        f'<path d="M19.1 1.9a10 10 0 0 1 0 14.2"/>'
+        f'<path d="M12 11v11"/>'
+        f'<path d="M9 22h6"/>'
+        f'</svg>'
+    )
+    svg_ml = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" '
+        f'stroke="{clr_tx}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        f'<rect x="4" y="4" width="16" height="16" rx="2"/>'
+        f'<rect x="9" y="9" width="6" height="6"/>'
+        f'<path d="M15 2v2M9 2v2M15 20v2M9 20v2M2 15h2M2 9h2M20 15h2M20 9h2"/>'
+        f'</svg>'
+    )
+    svg_decision = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" '
+        f'stroke="{clr_decision}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+        f'<rect width="18" height="18" x="3" y="3" rx="2"/>'
+        f'<path d="M11 9h4a2 2 0 0 0 2-2V3"/>'
+        f'<circle cx="9" cy="9" r="2"/>'
+        f'<path d="M7 21v-4a2 2 0 0 1 2-2h4"/>'
+        f'<circle cx="15" cy="15" r="2"/>'
+        f'</svg>'
+    )
+
+    icon_jam = f'<span class="node-icon-badge node-icon-badge-jam"><img width="22" height="22" style="display:block;" src="{_svg_data_uri(svg_jam)}" alt="Jammer"/></span>'
+    icon_rx = f'<span class="node-icon-badge node-icon-badge-rx"><img width="22" height="22" style="display:block;" src="{_svg_data_uri(svg_rx)}" alt="Receiver"/></span>'
+    icon_tx = f'<span class="node-icon-badge node-icon-badge-tx"><img width="22" height="22" style="display:block;" src="{_svg_data_uri(svg_tx)}" alt="Transmitter"/></span>'
+    icon_ml = f'<span class="node-icon-badge node-icon-badge-tx" style="width:28px;height:28px;border-radius:6px;"><img width="15" height="15" style="display:block;" src="{_svg_data_uri(svg_ml)}" alt="ML"/></span>'
+    icon_decision = f'<span class="node-icon-badge node-icon-badge-decision"><img width="22" height="22" style="display:block;" src="{_svg_data_uri(svg_decision)}" alt="Decision Engine"/></span>'
+
     # 3 Top Columns for the 3 Subsystems
     col_jam, col_rx, col_tx = st.columns(3, gap="medium")
 
@@ -1151,11 +1298,12 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             jam_badge_text = "EMITTING ECM" if is_jamming else "STANDBY / BENIGN"
             _html_block(f"""
             <div class="node-banner node-banner-jam">
-              <div class="node-banner-text">
-                <div class="node-banner-title">
-                  <span>Jammer (ECM Threat Node)</span>
+              <div class="node-banner-main">
+                {icon_jam}
+                <div class="node-banner-text">
+                  <div class="node-banner-title">Jammer (ECM Threat Node)</div>
+                  <div class="node-banner-subtitle">Adversary Electronic Attack & Interference</div>
                 </div>
-                <div class="node-banner-subtitle">Adversary Electronic Attack & Interference</div>
               </div>
               <span class="node-banner-badge {jam_badge_class}" style="letter-spacing:0.04em;">{jam_badge_text}</span>
             </div>
@@ -1284,11 +1432,12 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             spectrum_grid_html = f"""<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.35rem;margin-bottom:0.65rem;">{pills_html}</div>"""
             rx_html = f"""
             <div class="node-banner node-banner-rx">
-              <div class="node-banner-text">
-                <div class="node-banner-title">
-                  <span>Receiver (ES Sensing Node)</span>
+              <div class="node-banner-main">
+                {icon_rx}
+                <div class="node-banner-text">
+                  <div class="node-banner-title">Receiver (ES Sensing Node)</div>
+                  <div class="node-banner-subtitle">Electronic Support Spectrum Surveillance</div>
                 </div>
-                <div class="node-banner-subtitle">Electronic Support Spectrum Surveillance</div>
               </div>
               <span class="node-banner-badge node-badge-info" style="border-color:#2980b9;color:#2980b9;background:rgba(41,128,185,0.12);letter-spacing:0.04em;">CONTINUOUS SENSING</span>
             </div>
@@ -1335,11 +1484,12 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             tx_headroom = max(0.0, orch.config.max_power_db - last.tx_power_db)
             tx_html = f"""
             <div class="node-banner node-banner-tx">
-              <div class="node-banner-text">
-                <div class="node-banner-title">
-                  <span>Transmitter (ECCM Actuator)</span>
+              <div class="node-banner-main">
+                {icon_tx}
+                <div class="node-banner-text">
+                  <div class="node-banner-title">Transmitter (ECCM Actuator)</div>
+                  <div class="node-banner-subtitle">Adaptive RF Radiator & Attached Recommender</div>
                 </div>
-                <div class="node-banner-subtitle">Adaptive RF Radiator & Attached Recommender</div>
               </div>
               <span class="node-badge-ok node-banner-badge" style="border-color:#27ae60;color:#27ae60;background:rgba(39,174,96,0.12);letter-spacing:0.04em;">RF ACTIVE</span>
             </div>
@@ -1373,8 +1523,9 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
 
             <div class="ml-attached-card" style="border:1.5px solid rgba(39,174,96,0.45);border-left:4px solid #27ae60;border-radius:8px;padding:0.75rem 0.85rem;background:{'rgba(39,174,96,0.06)' if not dark else 'rgba(39,174,96,0.12)'};margin-top:0.4rem;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;">
-                <div class="ml-attached-title" style="margin-bottom:0;color:#27ae60;">
-                  Attached ML Policy (MLP Recommender)
+                <div class="ml-attached-title" style="margin-bottom:0;color:#27ae60;display:flex;align-items:center;gap:0.45rem;">
+                  {icon_ml}
+                  <span>Attached ML Policy (MLP Recommender)</span>
                 </div>
                 <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;padding:0.15rem 0.45rem;border-radius:3px;background:rgba(39,174,96,0.15);color:#27ae60;font-weight:700;border:1px solid rgba(39,174,96,0.35);">
                   NEURAL ENGINE
@@ -1456,15 +1607,16 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
         st.markdown('<div data-node="decision" style="display:none;"></div>', unsafe_allow_html=True)
         trace_html = f"""
         <div class="node-banner node-banner-decision">
-          <div class="node-banner-text">
-            <div class="node-banner-title">
-              <span>Cognitive Decision Engine — Full Explainability Trace</span>
+          <div class="node-banner-main">
+            {icon_decision}
+            <div class="node-banner-text">
+              <div class="node-banner-title">Cognitive Decision Engine — Full Explainability Trace</div>
+              <div class="node-banner-subtitle">Autonomous Closed-Loop Sense &rarr; Recommend &rarr; Safety Gate &rarr; Actuate</div>
             </div>
-            <div class="node-banner-subtitle">Autonomous Closed-Loop Sense &rarr; Recommend &rarr; Safety Gate &rarr; Actuate</div>
           </div>
           <div class="node-banner-badge" style="display:flex;align-items:center;gap:0.4rem;">
             <span class="status-pill status-{status}">{status}</span>
-            <span class="node-badge-info" style="border-color:#8e44ad;color:#8e44ad;background:rgba(142,68,173,0.12);font-weight:700;">ENGINE: {html.escape(engine)}</span>
+            <span class="node-badge-info" style="border-color:{'#334155' if not dark else '#64748b'};color:{'#0f172a' if not dark else '#e2e8f0'};background:{'rgba(51, 65, 85, 0.10)' if not dark else 'rgba(148, 163, 184, 0.14)'};font-weight:700;letter-spacing:0.04em;">ENGINE: {html.escape(engine)}</span>
           </div>
         </div>
 
@@ -1485,7 +1637,7 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
             <div style="color:{t['text_muted']};font-size:0.7rem;text-transform:uppercase;font-weight:600;">Power Advice</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:700;color:{t['text_strong']};">{html.escape(advice_txt)}</div>
           </div>
-          <div style="background:{t['panel']};border:1px solid {t['panel_border']};border-left:3px solid #8e44ad;border-radius:6px;padding:0.5rem 0.65rem;">
+          <div style="background:{t['panel']};border:1px solid {t['panel_border']};border-left:3px solid {'#334155' if not dark else '#94a3b8'};border-radius:6px;padding:0.5rem 0.65rem;">
             <div style="color:{t['text_muted']};font-size:0.7rem;text-transform:uppercase;font-weight:600;">Active Hop Set</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:700;color:{t['text_strong']};">{html.escape(hop)}</div>
           </div>
@@ -1559,15 +1711,28 @@ def main() -> None:
     )
     st.markdown(theme_css(st.session_state.theme_mode), unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <div class="hero">
-          <div class="hero-kicker">eAge Innovations — Software Demonstration</div>
-          <div class="hero-title">Cognitive Radio Channel Selection under Jamming</div>
-          <div class="hero-sub">
-            Configurable channel simulation · measurement-based receiver judgement ·
-            Cognitive Radio decision (rules / ML / hybrid) · adaptive hopping · power advice
+    logo_uri = _get_logo_data_uri()
+    logo_brand_html = (
+        f"""<div class="hero-brand">
+          <div class="hero-logo-card">
+            <img src="{logo_uri}" alt="eAge Innovations" class="hero-logo-img" />
           </div>
+        </div>"""
+        if logo_uri
+        else ""
+    )
+
+    st.markdown(
+        f"""
+        <div class="hero">
+          <div class="hero-content">
+            <div class="hero-title">Cognitive Radio Channel Selection under Jamming</div>
+            <div class="hero-sub">
+              Configurable channel simulation · measurement-based receiver judgement ·
+              Cognitive Radio decision (rules / ML / hybrid) · adaptive hopping · power advice
+            </div>
+          </div>
+          {logo_brand_html}
         </div>
         """,
         unsafe_allow_html=True,
