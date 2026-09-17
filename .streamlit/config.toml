@@ -1,13 +1,17 @@
 [theme]
-base = "light"
+base = "dark"
 primaryColor = "#2a5f7a"
-backgroundColor = "#f4f7fa"
-secondaryBackgroundColor = "#ffffff"
-textColor = "#1a2b3c"
+backgroundColor = "#0a1520"
+secondaryBackgroundColor = "#132536"
+textColor = "#e6edf2"
 font = "sans serif"
 
 [server]
 headless = true
+maxUploadSize = 50
 
 [browser]
 gatherUsageStats = false
+
+[client]
+showErrorDetails = true

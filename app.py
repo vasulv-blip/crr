@@ -1091,7 +1091,9 @@ def _init_state() -> None:
     if "orch" not in st.session_state:
         cfg = SimConfig(n_channels=8, decision_mode=DecisionMode.HYBRID, hop_enabled=False)
         orch = Orchestrator(cfg)
-        orch.train_ml(800)
+        # Fewer samples on first boot so Streamlit Community Cloud cold-starts stay responsive.
+        with st.spinner("Training ML recommender (first load)..."):
+            orch.train_ml(400)
         st.session_state.orch = orch
         st.session_state.last = orch.step()
         st.session_state.log = []
