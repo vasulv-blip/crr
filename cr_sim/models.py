@@ -96,6 +96,8 @@ class SimConfig:
     t_bad_db: float = 3.0
     min_power_db: float = 0.0
     max_power_db: float = 20.0
+    # Benign startup TX level so active carrier begins FREE (≥ t_good) before ECM.
+    start_power_db: float = 12.0
     power_step_db: float = 2.0
     seed: int = 42
     hop_enabled: bool = False

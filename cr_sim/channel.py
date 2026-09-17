@@ -124,16 +124,27 @@ class ChannelSimulator:
             else:
                 state = ChannelState.BLOCKED
 
-            # Non-TX channels: treat as sensing quality for occupancy
+            # Non-TX channels: occupancy / interference sensing proxy
             if k != tx_channel:
-                # Sensing proxy: high jam => blocked/degraded even without friendly signal
-                sense_signal = 0.5 * gain
-                sense_sinr = _db(sense_signal / interference)
-                if jam_p >= self.config.jam_power * 0.5:
-                    state = ChannelState.BLOCKED if sense_sinr < self.config.t_bad_db else ChannelState.DEGRADED
-                    sinr_db = sense_sinr
+                if jam_p <= 1e-9:
+                    # Clear spectrum hole (no ECM): show FREE for benign baseline demos
+                    state = ChannelState.FREE
+                    sinr_db = _db((10.0 * gain) / noise)
                 else:
-                    state = ChannelState.FREE if sense_sinr >= self.config.t_good_db else ChannelState.DEGRADED
+                    sense_signal = 0.5 * gain
+                    sense_sinr = _db(sense_signal / interference)
+                    if jam_p >= self.config.jam_power * 0.5:
+                        state = (
+                            ChannelState.BLOCKED
+                            if sense_sinr < self.config.t_bad_db
+                            else ChannelState.DEGRADED
+                        )
+                    elif sense_sinr >= self.config.t_good_db:
+                        state = ChannelState.FREE
+                    elif sense_sinr >= self.config.t_bad_db:
+                        state = ChannelState.DEGRADED
+                    else:
+                        state = ChannelState.BLOCKED
                     sinr_db = sense_sinr
 
             out.append(

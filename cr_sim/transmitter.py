@@ -11,13 +11,18 @@ class Transmitter:
     def __init__(self, config: SimConfig):
         self.config = config
         self.channel = 0
-        self.power_db = config.min_power_db
+        self.power_db = self._startup_power()
         self.hop_set: list[int] = list(range(min(3, config.n_channels)))
         self.hop_phase = 0
 
+    def _startup_power(self) -> float:
+        """Start high enough for a green FREE baseline, still within [min, max]."""
+        p = float(getattr(self.config, "start_power_db", self.config.min_power_db))
+        return min(self.config.max_power_db, max(self.config.min_power_db, p))
+
     def reset(self) -> None:
         self.channel = 0
-        self.power_db = self.config.min_power_db
+        self.power_db = self._startup_power()
         n = self.config.n_channels
         self.hop_set = list(range(min(3, n))) if n else [0]
         self.hop_phase = 0

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import base64
 import html
+import time
 from pathlib import Path
 import sys
 
@@ -276,6 +277,15 @@ ul[role="listbox"] li {{
 .stSlider label, .stSelectbox label, .stMultiSelect label, .stToggle label, .stRadio label {{
   color: {t['text']} !important;
 }}
+div[role="radiogroup"] label,
+div[role="radiogroup"] label span,
+div[role="radiogroup"] p,
+div[role="radiogroup"] [data-testid="stMarkdownContainer"] p,
+.stRadio [data-testid="stMarkdownContainer"] p {{
+  color: {t['text']} !important;
+  -webkit-text-fill-color: {t['text']} !important;
+  opacity: 1 !important;
+}}
 /* Do not restyle dataframe grid internals — that blanks the table in Streamlit */
 div[data-testid="stDataFrame"] {{
   border: 1px solid {t['panel_border']} !important;
@@ -315,6 +325,8 @@ div[data-testid="stTable"] td {{
 .hero-content {{
   flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
+  padding-right: 0.25rem;
 }}
 .hero-title {{
   color: {t['hero_title']};
@@ -326,18 +338,20 @@ div[data-testid="stTable"] td {{
 .hero-sub {{
   color: {t['hero_sub']};
   margin-top: 0.40rem;
-  font-size: 0.92rem;
+  font-size: 0.78rem;
   line-height: 1.45;
+  white-space: nowrap;
 }}
 .hero-brand {{
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }}
 .hero-logo-card {{
   background: #ffffff;
-  padding: 0.45rem 0.90rem;
+  padding: 0.35rem 0.7rem;
   border-radius: 8px;
   border: 1px solid {"#d5dee7" if not dark else "rgba(255, 255, 255, 0.22)"};
   box-shadow: {"0 2px 8px rgba(0, 0, 0, 0.06)" if not dark else "0 4px 16px rgba(0, 0, 0, 0.45)"};
@@ -347,7 +361,7 @@ div[data-testid="stTable"] td {{
 }}
 .hero-logo-img {{
   display: block;
-  height: 42px;
+  height: 34px;
   width: auto;
   object-fit: contain;
 }}
@@ -877,6 +891,59 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node]) .stSelectbox,
 div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node]) .stSlider {{
   margin-bottom: 0.25rem;
 }}
+/* Expanders: remove default white header; match panel theme */
+div[data-testid="stExpander"],
+details[data-testid="stExpander"] {{
+  background: {t['panel']} !important;
+  border: 1px solid {t['panel_border']} !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}}
+div[data-testid="stExpander"] > details,
+details[data-testid="stExpander"] {{
+  background: {t['panel']} !important;
+  border: none !important;
+}}
+div[data-testid="stExpander"] summary,
+div[data-testid="stExpander"] [data-testid="stExpanderDetails"],
+details[data-testid="stExpander"] > summary,
+.streamlit-expanderHeader {{
+  background: {t['btn_bg']} !important;
+  color: {t['text_strong']} !important;
+  border: none !important;
+  border-radius: 0 !important;
+}}
+div[data-testid="stExpander"] summary:hover,
+.streamlit-expanderHeader:hover {{
+  background: {t['btn_hover']} !important;
+  color: {t['text_strong']} !important;
+}}
+div[data-testid="stExpander"] summary p,
+div[data-testid="stExpander"] summary span,
+div[data-testid="stExpander"] summary svg,
+.streamlit-expanderHeader p,
+.streamlit-expanderHeader span,
+.streamlit-expanderHeader svg {{
+  color: {t['text_strong']} !important;
+  fill: {t['text_strong']} !important;
+}}
+div[data-testid="stExpander"] [data-testid="stExpanderDetails"],
+div[data-testid="stExpander"] .streamlit-expanderContent,
+details[data-testid="stExpander"] > div {{
+  background: {t['panel']} !important;
+  border-top: 1px solid {t['panel_border']} !important;
+  color: {t['text']} !important;
+}}
+section[data-testid="stSidebar"] div[data-testid="stExpander"],
+section[data-testid="stSidebar"] details[data-testid="stExpander"] {{
+  background: {t['input_bg']} !important;
+  border: 1px solid {t['input_border']} !important;
+}}
+section[data-testid="stSidebar"] div[data-testid="stExpander"] summary,
+section[data-testid="stSidebar"] .streamlit-expanderHeader {{
+  background: {t['btn_bg']} !important;
+  color: {t['text_strong']} !important;
+}}
 div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node]) label p {{
   font-size: 0.76rem !important;
   font-weight: 600 !important;
@@ -888,6 +955,86 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has([data-node]) label p {{
   border-top: 1px solid {t['chrome_border']};
   margin-top: 1.2rem;
   padding-top: 0.8rem;
+}}
+.theme-right-anchor {{
+  display: none;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) {{
+  display: flex !important;
+  justify-content: flex-end !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] {{
+  width: auto !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stWidgetLabel"] {{
+  justify-content: flex-end !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] {{
+  justify-content: flex-end !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] label,
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] label span,
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] p,
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p,
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] label,
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] label span,
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] p {{
+  color: {t['text']} !important;
+  -webkit-text-fill-color: {t['text']} !important;
+  opacity: 1 !important;
+}}
+.logout-banner {{
+  border: 1px solid {t['ok_bd']};
+  background: {t['ok_bg']};
+  color: {t['ok_fg']};
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  margin: 0.35rem 0 0.75rem;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 650;
+  font-size: 0.95rem;
+  text-align: center;
+}}
+/* Compact centred logout modal (st.dialog) */
+div[data-testid="stDialog"] {{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}}
+div[data-testid="stDialog"] > div {{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}}
+div[data-testid="stDialog"] div[role="dialog"] {{
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  width: 280px !important;
+  max-width: 280px !important;
+  margin: 0 auto !important;
+  padding: 0.85rem 0.95rem 0.75rem !important;
+}}
+div[data-testid="stDialog"] [data-testid="stVerticalBlock"] {{
+  gap: 0.35rem !important;
+}}
+div[data-testid="stDialog"] [data-testid="stMarkdownContainer"] p {{
+  margin: 0.15rem 0 0.35rem !important;
+  font-size: 0.92rem !important;
+}}
+div[data-testid="stDialog"] div.stButton {{
+  display: flex !important;
+  justify-content: center !important;
+}}
+div[data-testid="stDialog"] div.stButton > button {{
+  min-width: 72px !important;
+  width: auto !important;
+  padding: 0.35rem 1.1rem !important;
 }}
 {'' if dark else '''
 /* Light mode: dark labels on secondary; white labels on primary (navy) */
@@ -918,9 +1065,27 @@ section[data-testid="stSidebar"] div.stButton > button[data-testid="stBaseButton
 """
 
 
+# Simple demo credentials for the defence presentation login gate.
+DEMO_USERNAME = "pocuser"
+DEMO_PASSWORD = "poc123"
+# Audience organisations shown on the login screen. Add more names later as needed.
+DEMO_AUDIENCE_ORGS = ["Defense Labs"]
+
+
+def _init_auth_state() -> None:
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    if "logout_notice" not in st.session_state:
+        st.session_state.logout_notice = False
+    if "login_error" not in st.session_state:
+        st.session_state.login_error = ""
+    if "theme_mode" not in st.session_state:
+        st.session_state.theme_mode = "Dark"
+
+
 def _init_state() -> None:
     if "theme_mode" not in st.session_state:
-        st.session_state.theme_mode = "Light"
+        st.session_state.theme_mode = "Dark"
     if "ui_view" not in st.session_state:
         st.session_state.ui_view = "System Architecture & Node View"
     if "orch" not in st.session_state:
@@ -930,6 +1095,484 @@ def _init_state() -> None:
         st.session_state.orch = orch
         st.session_state.last = orch.step()
         st.session_state.log = []
+
+
+def _login_css(mode: str) -> str:
+    dark = mode == "Dark"
+    if dark:
+        app_bg = "linear-gradient(180deg, #0a1520 0%, #0f1f2e 45%, #122433 100%)"
+        hero_bg = "linear-gradient(135deg, #102032 0%, #163047 100%)"
+        hero_border = "#2a4256"
+        hero_title = "#f5f8fa"
+        hero_sub = "#b7c7d4"
+        hero_shadow = "0 4px 16px rgba(0, 0, 0, 0.35)"
+        logo_border = "rgba(255, 255, 255, 0.22)"
+        logo_shadow = "0 4px 16px rgba(0, 0, 0, 0.45)"
+        panel_bg = "#132536"
+        panel_border = "#2a4256"
+        brief = "#5ec8ff"
+        indigenous_fg = "#0b1c2c"
+        indigenous_bd = "rgba(255, 255, 255, 0.35)"
+        indigenous_bg = "linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)"
+        footer = "#7f94a5"
+        chrome_border = "#243647"
+        logout_bg = "#163528"
+        logout_fg = "#7dcea0"
+        logout_bd = "#2f6b4f"
+        input_bg = "#132536"
+        input_border = "#2a4256"
+        input_text = "#e6edf2"
+        label = "#e6edf2"
+        btn_bg = "#2a5f7a"
+        btn_border = "#3d7ea0"
+    else:
+        app_bg = "linear-gradient(180deg, #f4f7fa 0%, #eef3f7 45%, #e8eef4 100%)"
+        hero_bg = "linear-gradient(135deg, #ffffff 0%, #eef4f8 100%)"
+        hero_border = "#cfdbe6"
+        hero_title = "#0b2a5b"
+        hero_sub = "#3d5266"
+        hero_shadow = "0 2px 10px rgba(0, 0, 0, 0.04)"
+        logo_border = "#d5dee7"
+        logo_shadow = "0 2px 8px rgba(0, 0, 0, 0.06)"
+        panel_bg = "#ffffff"
+        panel_border = "#d0dbe6"
+        brief = "#0b6e99"
+        indigenous_fg = "#0b1c2c"
+        indigenous_bd = "#8fa6b8"
+        indigenous_bg = "linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%)"
+        footer = "#6a7f92"
+        chrome_border = "#d5dee7"
+        logout_bg = "#e7f5ec"
+        logout_fg = "#1b6b3a"
+        logout_bd = "#8fc9a5"
+        input_bg = "#ffffff"
+        input_border = "#c5d0db"
+        input_text = "#1a2b3c"
+        label = "#1a2b3c"
+        btn_bg = "#1e4f68"
+        btn_border = "#1e4f68"
+
+    return f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+html, body, [class*="css"] {{
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: {label};
+}}
+.stApp {{
+  background: {app_bg};
+}}
+section[data-testid="stSidebar"] {{ display: none !important; }}
+div[data-testid="stSidebarCollapsedControl"] {{ display: none !important; }}
+.block-container {{
+  padding-top: 1.2rem !important;
+  padding-bottom: 5.5rem !important;
+  max-width: 1100px !important;
+  min-height: 100vh !important;
+}}
+.hero {{
+  border: 1px solid {hero_border};
+  background: {hero_bg};
+  border-radius: 8px;
+  padding: 1.1rem 1.3rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: {hero_shadow};
+}}
+.hero-content {{
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 0.25rem;
+}}
+.hero-title {{
+  color: {hero_title};
+  font-size: 1.35rem;
+  font-weight: 650;
+  margin: 0;
+  line-height: 1.25;
+}}
+.hero-sub {{
+  color: {hero_sub};
+  margin-top: 0.35rem;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  white-space: nowrap;
+}}
+.hero-brand {{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}}
+.hero-logo-card {{
+  background: #ffffff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid {logo_border};
+  box-shadow: {logo_shadow};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}}
+.hero-logo-img {{
+  display: block;
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+}}
+.login-spacer {{
+  height: clamp(0.85rem, 5vh, 3rem);
+}}
+.indigenous-badge {{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  margin: 0.85rem auto 0;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid {indigenous_bd};
+  border-radius: 999px;
+  background: {indigenous_bg};
+  box-shadow: {hero_shadow};
+  box-sizing: border-box;
+}}
+.indigenous-mark {{
+  display: none;
+}}
+.indigenous-text {{
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: {indigenous_fg};
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}}
+.login-panel {{
+  border: 1px solid {panel_border};
+  background: {panel_bg};
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+  padding: 1.15rem 1.25rem 0.7rem;
+  margin: 0 auto;
+  text-align: center;
+}}
+.login-brief {{
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: {brief};
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}}
+.login-brief b {{
+  color: {brief};
+  font-weight: 700;
+}}
+div[data-testid="stForm"] {{
+  border: 1px solid {panel_border} !important;
+  border-top: 1px solid {panel_border} !important;
+  border-radius: 0 0 8px 8px !important;
+  background: {panel_bg} !important;
+  padding: 0.65rem 1.25rem 1.15rem !important;
+  margin-top: 0 !important;
+}}
+.logout-banner {{
+  border: 1px solid {logout_bd};
+  background: {logout_bg};
+  color: {logout_fg};
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.7rem;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 650;
+  font-size: 0.9rem;
+  text-align: center;
+}}
+.footer-note {{
+  position: fixed !important;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  color: {footer};
+  font-size: 0.78rem;
+  border-top: 1px solid {chrome_border};
+  margin: 0 !important;
+  padding: 0.7rem 1.5rem 0.85rem !important;
+  line-height: 1.45;
+  background: {"rgba(10, 21, 32, 0.96)" if dark else "rgba(244, 247, 250, 0.97)"};
+}}
+div[data-testid="stHorizontalBlock"]:has(.theme-right-anchor) {{
+  justify-content: flex-end !important;
+}}
+.theme-right-anchor {{
+  display: none;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) {{
+  display: flex !important;
+  justify-content: flex-end !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] {{
+  width: auto !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stWidgetLabel"] {{
+  justify-content: flex-end !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] {{
+  justify-content: flex-end !important;
+}}
+.stTextInput label,
+.stRadio label,
+.stRadio [data-testid="stWidgetLabel"] p,
+.stRadio [data-testid="stMarkdownContainer"] p,
+div[role="radiogroup"] label,
+div[role="radiogroup"] label span,
+div[role="radiogroup"] p {{
+  color: {label} !important;
+  -webkit-text-fill-color: {label} !important;
+  opacity: 1 !important;
+}}
+div[data-baseweb="radio"] label,
+div[data-baseweb="radio"] span {{
+  color: {label} !important;
+  -webkit-text-fill-color: {label} !important;
+}}
+div[data-baseweb="input"] > div,
+div[data-baseweb="base-input"],
+.stTextInput input {{
+  background-color: {input_bg} !important;
+  color: {input_text} !important;
+  border-color: {input_border} !important;
+}}
+button[kind="primary"],
+button[data-testid="baseButton-primary"],
+button[data-testid="stBaseButton-primary"],
+div.stButton > button[kind="primary"] {{
+  background-color: {btn_bg} !important;
+  border: 1px solid {btn_border} !important;
+  color: #ffffff !important;
+}}
+button[kind="primary"] *,
+button[data-testid="baseButton-primary"] *,
+button[data-testid="stBaseButton-primary"] * {{
+  color: #ffffff !important;
+}}
+</style>
+"""
+
+
+def _audience_brief_html() -> str:
+    """Build login audience line from DEMO_AUDIENCE_ORGS (extend that list to add orgs)."""
+    orgs = [str(o).strip() for o in DEMO_AUDIENCE_ORGS if str(o).strip()]
+    if not orgs:
+        return "Demo for defence organisations"
+    if len(orgs) == 1:
+        return f'Demo for <b>{html.escape(orgs[0])}</b>'
+    if len(orgs) == 2:
+        return f'Demo for <b>{html.escape(orgs[0])}</b> and <b>{html.escape(orgs[1])}</b>'
+    listed = ", ".join(f"<b>{html.escape(o)}</b>" for o in orgs[:-1])
+    return f"Demo for {listed}, and <b>{html.escape(orgs[-1])}</b>"
+
+
+def render_login_screen() -> None:
+    """Simple branded login gate before the Cognitive Radio demo."""
+    theme_mode = st.session_state.theme_mode
+    st.markdown(
+        f'<div id="cr-theme-root" data-theme="{theme_mode.lower()}"></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(_login_css(theme_mode), unsafe_allow_html=True)
+
+    _theme_spacer, theme_col = st.columns([6, 1.15])
+    with theme_col:
+        st.markdown('<div class="theme-right-anchor"></div>', unsafe_allow_html=True)
+        theme_mode = st.radio(
+            "Theme",
+            options=["Light", "Dark"],
+            index=0 if st.session_state.theme_mode == "Light" else 1,
+            horizontal=True,
+            key="login_theme_radio",
+            label_visibility="collapsed",
+        )
+        if theme_mode != st.session_state.theme_mode:
+            st.session_state.theme_mode = theme_mode
+            st.rerun()
+
+    logo_uri = _get_logo_data_uri()
+    logo_brand_html = (
+        f"""<div class="hero-brand">
+          <div class="hero-logo-card">
+            <img src="{logo_uri}" alt="eAge" class="hero-logo-img" />
+          </div>
+        </div>"""
+        if logo_uri
+        else ""
+    )
+
+    st.markdown(
+        f"""
+        <div class="hero">
+          <div class="hero-content">
+            <div class="hero-title">Cognitive Radio Channel Selection under Jamming</div>
+            <div class="hero-sub">
+              Channel simulation · measurement-based receiver · CR decision (rules / ML / hybrid) · adaptive hopping · power advice
+            </div>
+          </div>
+          {logo_brand_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="login-spacer"></div>', unsafe_allow_html=True)
+
+    left, mid, right = st.columns([1.35, 1.2, 1.35])
+    with mid:
+        st.markdown(
+            f"""
+            <div class="login-panel">
+              <div class="login-brief">{_audience_brief_html()}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        with st.form("cr_login_form", clear_on_submit=False):
+            username = st.text_input("Username", placeholder="Enter username")
+            password = st.text_input("Password", type="password", placeholder="Enter password")
+            submitted = st.form_submit_button("Login", type="primary", use_container_width=True)
+
+        if submitted:
+            if username.strip() == DEMO_USERNAME and password == DEMO_PASSWORD:
+                st.session_state.authenticated = True
+                st.session_state.login_error = ""
+                st.session_state.logout_notice = False
+                st.rerun()
+            else:
+                st.session_state.login_error = "Invalid username or password."
+
+        if st.session_state.login_error:
+            st.error(st.session_state.login_error)
+
+        st.markdown(
+            """
+            <div class="indigenous-badge">
+              <div class="indigenous-mark" aria-hidden="true"></div>
+              <div class="indigenous-text">Indigenously&nbsp;made&nbsp;for&nbsp;Indian&nbsp;Defence&nbsp;Labs</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown(
+        """
+        <div class="footer-note">
+          Software-only demonstration for technical review. No radiated RF. Receiver judgement is measurement-based.
+          ML uses a supervised MLP behind the same Cognitive Radio interface, with rule-based safety overrides.
+          Interfaces are structured for later eADM connection without redesigning the decision engine.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def do_logout() -> None:
+    """Open Logged out modal on the post-login screen, then return to login."""
+    st.session_state.logout_notice = True
+    st.session_state.login_error = ""
+    st.rerun()
+
+
+def logged_out_dialog() -> None:
+    """Compact centred logout modal on the post-login screen, then return to login."""
+    dark = st.session_state.theme_mode == "Dark"
+    card_bg = "#132536" if dark else "#ffffff"
+    card_bd = "#2a4256" if dark else "#d0dbe6"
+    title_c = "#f5f8fa" if dark else "#0b2a5b"
+    body_c = "#b7c7d4" if dark else "#3d5266"
+    btn_bg = "#1a3348" if dark else "#d8e4ee"
+    btn_bd = "#3d5a70" if dark else "#8fa6b8"
+    btn_fg = "#eef4f8" if dark else "#0b1c2c"
+    st.markdown(
+        f"""
+<style>
+.cr-logout-overlay {{
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 12, 20, 0.55);
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}}
+.cr-logout-card {{
+  background: {card_bg};
+  border: 2px solid {card_bd};
+  border-radius: 10px;
+  width: 340px;
+  max-width: 90vw;
+  height: 148px;
+  box-sizing: border-box;
+  padding: 1.35rem 1.2rem 0;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}}
+.cr-logout-card p {{
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: {title_c};
+  font-family: 'IBM Plex Sans', sans-serif;
+}}
+.st-key-logout_ok_btn {{
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, 22px) !important;
+  z-index: 10060 !important;
+  width: 96px !important;
+}}
+.st-key-logout_ok_btn div.stButton > button,
+.st-key-logout_ok_btn div.stButton > button[kind="secondary"],
+.st-key-logout_ok_btn div.stButton > button[kind="primary"] {{
+  width: 96px !important;
+  min-height: 2rem !important;
+  padding: 0.28rem 0.7rem !important;
+  background-color: {btn_bg} !important;
+  background-image: none !important;
+  border: 1px solid {btn_bd} !important;
+  color: {btn_fg} !important;
+}}
+.st-key-logout_ok_btn div.stButton > button *,
+.st-key-logout_ok_btn div.stButton > button[kind="primary"] * {{
+  color: {btn_fg} !important;
+  -webkit-text-fill-color: {btn_fg} !important;
+}}
+</style>
+<div class="cr-logout-overlay">
+  <div class="cr-logout-card">
+    <p>You have been logged out.</p>
+  </div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if st.button("OK", key="logout_ok_btn"):
+        st.session_state.logout_notice = False
+        st.session_state.authenticated = False
+        st.rerun()
 
 
 def _card_style(state: str, active: bool, dark: bool) -> str:
@@ -1376,38 +2019,34 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
                     st.session_state.last = orch.step()
                     st.rerun()
 
-            _html_block("""
-            <div class="sleek-section-divider-jam" style="margin-top:0.4rem;">
-              <span>Quick Threat Presets</span>
-            </div>
-            """)
-            pre_c1, pre_c2 = st.columns(2)
-            with pre_c1:
-                if st.button("Spot CH0", key="arch_node_pre_spot", use_container_width=True):
-                    orch.config.jam_power = float(sel_jam_power)
-                    orch.channel.config.jam_power = float(sel_jam_power)
-                    orch.set_jam(JamProfile.SPOT, [0])
-                    st.session_state.last = orch.step()
-                    st.rerun()
-                if st.button("Sweep Jam", key="arch_node_pre_sweep", use_container_width=True):
-                    orch.config.jam_power = float(sel_jam_power)
-                    orch.channel.config.jam_power = float(sel_jam_power)
-                    orch.set_jam(JamProfile.SWEEP)
-                    st.session_state.last = orch.step()
-                    st.rerun()
-            with pre_c2:
-                if st.button("Multi CH0,1", key="arch_node_pre_multi", use_container_width=True):
-                    orch.config.jam_power = float(sel_jam_power)
-                    orch.channel.config.jam_power = float(sel_jam_power)
-                    orch.set_jam(JamProfile.MULTI_SPOT, [0, 1] if n_ch > 1 else [0])
-                    st.session_state.last = orch.step()
-                    st.rerun()
-                if st.button("Barrage Jam", key="arch_node_pre_barrage", use_container_width=True):
-                    orch.config.jam_power = float(sel_jam_power)
-                    orch.channel.config.jam_power = float(sel_jam_power)
-                    orch.set_jam(JamProfile.BARRAGE)
-                    st.session_state.last = orch.step()
-                    st.rerun()
+            with st.expander("Quick Threat Presets (optional)", expanded=False):
+                pre_c1, pre_c2 = st.columns(2)
+                with pre_c1:
+                    if st.button("Spot CH0", key="arch_node_pre_spot", use_container_width=True):
+                        orch.config.jam_power = float(sel_jam_power)
+                        orch.channel.config.jam_power = float(sel_jam_power)
+                        orch.set_jam(JamProfile.SPOT, [0])
+                        st.session_state.last = orch.step()
+                        st.rerun()
+                    if st.button("Sweep Jam", key="arch_node_pre_sweep", use_container_width=True):
+                        orch.config.jam_power = float(sel_jam_power)
+                        orch.channel.config.jam_power = float(sel_jam_power)
+                        orch.set_jam(JamProfile.SWEEP)
+                        st.session_state.last = orch.step()
+                        st.rerun()
+                with pre_c2:
+                    if st.button("Multi CH0,1", key="arch_node_pre_multi", use_container_width=True):
+                        orch.config.jam_power = float(sel_jam_power)
+                        orch.channel.config.jam_power = float(sel_jam_power)
+                        orch.set_jam(JamProfile.MULTI_SPOT, [0, 1] if n_ch > 1 else [0])
+                        st.session_state.last = orch.step()
+                        st.rerun()
+                    if st.button("Barrage Jam", key="arch_node_pre_barrage", use_container_width=True):
+                        orch.config.jam_power = float(sel_jam_power)
+                        orch.channel.config.jam_power = float(sel_jam_power)
+                        orch.set_jam(JamProfile.BARRAGE)
+                        st.session_state.last = orch.step()
+                        st.rerun()
 
             _html_block(f"""
             <div class="sleek-card-footer">
@@ -1672,10 +2311,21 @@ def render_architecture_view(orch: Orchestrator, last, dark: bool, t: dict) -> N
 
 
 def main() -> None:
+    _init_auth_state()
+    if not st.session_state.authenticated:
+        render_login_screen()
+        return
+
     _init_state()
     orch: Orchestrator = st.session_state.orch
 
     with st.sidebar:
+        st.markdown("### User")
+        st.caption(f"Signed in as `{DEMO_USERNAME}`")
+        if st.button("Logout", use_container_width=True, key="sidebar_logout_btn"):
+            do_logout()
+
+        st.markdown("---")
         st.markdown("### Display View")
         view_opts = ["System Architecture & Node View", "Operator Spectrum View"]
         side_idx = 0 if st.session_state.ui_view == view_opts[0] else 1
@@ -1689,19 +2339,6 @@ def main() -> None:
             st.session_state.ui_view = side_view
             st.rerun()
 
-        st.markdown("---")
-        st.markdown("### Appearance")
-        theme_mode = st.radio(
-            "Theme",
-            options=["Light", "Dark"],
-            index=0 if st.session_state.theme_mode == "Light" else 1,
-            horizontal=True,
-            help="Switch between light mode and dark mode.",
-        )
-        if theme_mode != st.session_state.theme_mode:
-            st.session_state.theme_mode = theme_mode
-            st.rerun()
-
     dark = st.session_state.theme_mode == "Dark"
     tokens = get_theme_tokens(st.session_state.theme_mode)
 
@@ -1710,6 +2347,25 @@ def main() -> None:
         unsafe_allow_html=True,
     )
     st.markdown(theme_css(st.session_state.theme_mode), unsafe_allow_html=True)
+
+    if st.session_state.logout_notice:
+        logged_out_dialog()
+
+    _theme_spacer, theme_col = st.columns([6, 1.15])
+    with theme_col:
+        st.markdown('<div class="theme-right-anchor"></div>', unsafe_allow_html=True)
+        theme_mode = st.radio(
+            "Theme",
+            options=["Light", "Dark"],
+            index=0 if st.session_state.theme_mode == "Light" else 1,
+            horizontal=True,
+            key="main_theme_radio",
+            label_visibility="collapsed",
+            help="Switch between light mode and dark mode.",
+        )
+        if theme_mode != st.session_state.theme_mode:
+            st.session_state.theme_mode = theme_mode
+            st.rerun()
 
     logo_uri = _get_logo_data_uri()
     logo_brand_html = (
@@ -1728,8 +2384,7 @@ def main() -> None:
           <div class="hero-content">
             <div class="hero-title">Cognitive Radio Channel Selection under Jamming</div>
             <div class="hero-sub">
-              Configurable channel simulation · measurement-based receiver judgement ·
-              Cognitive Radio decision (rules / ML / hybrid) · adaptive hopping · power advice
+              Channel simulation · measurement-based receiver · CR decision (rules / ML / hybrid) · adaptive hopping · power advice
             </div>
           </div>
           {logo_brand_html}
@@ -1766,7 +2421,18 @@ def main() -> None:
         t_good = st.slider("SINR FREE threshold (dB)", 5.0, 20.0, float(orch.config.t_good_db), 0.5)
         t_bad = st.slider("SINR BLOCKED threshold (dB)", -5.0, 8.0, float(orch.config.t_bad_db), 0.5)
         max_power = st.slider("Maximum TX power (dB)", 5.0, 30.0, float(orch.config.max_power_db), 1.0)
-        seed = st.number_input("Seed", min_value=0, max_value=999999, value=int(orch.config.seed), step=1)
+        seed = int(orch.config.seed)
+        with st.expander("Seed / reproducibility (optional)", expanded=False):
+            seed = int(
+                st.number_input(
+                    "Seed",
+                    min_value=0,
+                    max_value=999999,
+                    value=int(orch.config.seed),
+                    step=1,
+                    key="sidebar_seed_input",
+                )
+            )
 
         apply_cfg = st.button("Apply configuration", use_container_width=True)
         if apply_cfg:
