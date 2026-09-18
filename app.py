@@ -964,7 +964,8 @@ div[data-testid="column"]:has(.theme-right-anchor) {{
   justify-content: flex-end !important;
 }}
 div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] {{
-  width: auto !important;
+  width: max-content !important;
+  min-width: 11rem !important;
   margin-left: auto !important;
   text-align: right !important;
 }}
@@ -972,7 +973,17 @@ div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stWidgetLabel"]
   justify-content: flex-end !important;
 }}
 div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] {{
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
   justify-content: flex-end !important;
+  gap: 0.75rem !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] > label,
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] > div {{
+  margin: 0 !important;
+  white-space: nowrap !important;
 }}
 div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] label,
 div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] label span,
@@ -1326,7 +1337,8 @@ div[data-testid="column"]:has(.theme-right-anchor) {{
   justify-content: flex-end !important;
 }}
 div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stRadio"] {{
-  width: auto !important;
+  width: max-content !important;
+  min-width: 11rem !important;
   margin-left: auto !important;
   text-align: right !important;
 }}
@@ -1334,7 +1346,17 @@ div[data-testid="column"]:has(.theme-right-anchor) [data-testid="stWidgetLabel"]
   justify-content: flex-end !important;
 }}
 div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] {{
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
   justify-content: flex-end !important;
+  gap: 0.75rem !important;
+}}
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] > label,
+div[data-testid="column"]:has(.theme-right-anchor) div[role="radiogroup"] > div {{
+  margin: 0 !important;
+  white-space: nowrap !important;
 }}
 .stTextInput label,
 .stRadio label,
@@ -1398,7 +1420,7 @@ def render_login_screen() -> None:
     )
     st.markdown(_login_css(theme_mode), unsafe_allow_html=True)
 
-    _theme_spacer, theme_col = st.columns([6, 1.15])
+    _theme_spacer, theme_col = st.columns([5, 2])
     with theme_col:
         st.markdown('<div class="theme-right-anchor"></div>', unsafe_allow_html=True)
         theme_mode = st.radio(
@@ -2353,7 +2375,7 @@ def main() -> None:
     if st.session_state.logout_notice:
         logged_out_dialog()
 
-    _theme_spacer, theme_col = st.columns([6, 1.15])
+    _theme_spacer, theme_col = st.columns([5, 2])
     with theme_col:
         st.markdown('<div class="theme-right-anchor"></div>', unsafe_allow_html=True)
         theme_mode = st.radio(
