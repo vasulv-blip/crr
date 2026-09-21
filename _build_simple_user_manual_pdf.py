@@ -68,8 +68,7 @@ def title_block(pdf: PDF):
         0,
         5,
         clean(
-            "This short guide shows how to log in, configure the demo, and run the main operating scenarios. "
-            "Each scenario is numbered. Steps under a scenario use sub-numbers such as 1.1, 1.2, and so on."
+            "This short guide shows how to log in, configure the demo, and run the main operating scenarios."
         ),
     )
     pdf.ln(2)
@@ -291,11 +290,6 @@ def build():
     clause(pdf, "15.3", "ML not trained message -> Apply configuration or Reset simulation.")
     clause(pdf, "15.4", "Need a clean demo again -> Silence / Clear jam, then Reset simulation.")
     clause(pdf, "15.5", "Local start command (if running on a PC): python -m streamlit run app.py then open http://localhost:8501")
-
-    pdf.ln(4)
-    pdf.set_font("Helvetica", "I", 9)
-    pdf.set_text_color(*MUTED)
-    pdf.multi_cell(0, 5, clean("- End of simple user manual -"))
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     pdf.output(str(OUT))
