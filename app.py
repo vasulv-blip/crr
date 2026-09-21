@@ -1081,6 +1081,36 @@ DEMO_USERNAME = "pocuser"
 DEMO_PASSWORD = "poc123"
 # Audience organisations shown on the login screen. Add more names later as needed.
 DEMO_AUDIENCE_ORGS = ["Defense Labs"]
+HELP_MANUAL_PATH = ROOT / "docs" / "Cognitive_Radio_Simple_User_Manual.pdf"
+HELP_MANUAL_LABEL = "Help Manual (PDF)"
+
+
+@st.cache_data(show_spinner=False)
+def _load_help_manual_bytes() -> bytes | None:
+    """Load the simple operator PDF if present beside the app."""
+    try:
+        if HELP_MANUAL_PATH.is_file():
+            return HELP_MANUAL_PATH.read_bytes()
+    except OSError:
+        return None
+    return None
+
+
+def render_help_manual_button(*, key: str, use_container_width: bool = True) -> None:
+    """Offer the simple user manual as a downloadable Help Manual PDF."""
+    data = _load_help_manual_bytes()
+    if not data:
+        st.caption("Help Manual PDF is not available in this deploy.")
+        return
+    st.download_button(
+        label=HELP_MANUAL_LABEL,
+        data=data,
+        file_name=HELP_MANUAL_PATH.name,
+        mime="application/pdf",
+        key=key,
+        use_container_width=use_container_width,
+        help="Download the simple numbered scenario user manual (PDF).",
+    )
 
 
 def _init_auth_state() -> None:
@@ -1499,6 +1529,8 @@ def render_login_screen() -> None:
             """,
             unsafe_allow_html=True,
         )
+        st.markdown("")
+        render_help_manual_button(key="login_help_manual_btn")
 
     st.markdown(
         """
@@ -2348,6 +2380,9 @@ def main() -> None:
         st.caption(f"Signed in as `{DEMO_USERNAME}`")
         if st.button("Logout", use_container_width=True, key="sidebar_logout_btn"):
             do_logout()
+
+        st.markdown("### Help")
+        render_help_manual_button(key="dashboard_help_manual_btn")
 
         st.markdown("---")
         st.markdown("### Display View")
