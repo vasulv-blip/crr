@@ -16,6 +16,7 @@ import sys
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
@@ -1097,19 +1098,48 @@ def _load_help_manual_bytes() -> bytes | None:
 
 
 def render_help_manual_button(*, key: str, use_container_width: bool = True) -> None:
-    """Offer the simple user manual as a downloadable Help Manual PDF."""
+    """Open the Help Manual PDF in a new browser tab (view, not download)."""
     data = _load_help_manual_bytes()
     if not data:
         st.caption("Help Manual PDF is not available in this deploy.")
         return
-    st.download_button(
-        label=HELP_MANUAL_LABEL,
-        data=data,
-        file_name=HELP_MANUAL_PATH.name,
-        mime="application/pdf",
-        key=key,
-        use_container_width=use_container_width,
-        help="Download the simple numbered scenario user manual (PDF).",
+
+    # Blob URL + target=_blank opens the browser PDF viewer in a new tab.
+    # components.html avoids Streamlit sanitising data: / blob: hrefs.
+    b64 = base64.b64encode(data).decode("ascii")
+    dark = st.session_state.get("theme_mode", "Dark") == "Dark"
+    if dark:
+        bg, bd, fg = "#1a3348", "#3d5a70", "#eef4f8"
+    else:
+        bg, bd, fg = "#d8e4ee", "#8fa6b8", "#0b1c2c"
+    width_css = "width:100%;" if use_container_width else "width:auto;"
+    anchor_id = f"help-manual-{key}"
+
+    components.html(
+        f"""
+        <div style="margin:0;padding:0;">
+          <a id="{anchor_id}" href="#" target="_blank" rel="noopener noreferrer"
+             title="Open the simple numbered scenario user manual in a new tab"
+             style="display:block;{width_css}box-sizing:border-box;text-align:center;
+                    padding:0.5rem 0.85rem;border-radius:0.45rem;border:1px solid {bd};
+                    background:{bg};color:{fg};text-decoration:none;
+                    font-family:'Source Sans Pro',sans-serif;font-size:0.95rem;font-weight:600;
+                    cursor:pointer;">
+            {HELP_MANUAL_LABEL}
+          </a>
+        </div>
+        <script>
+        (function () {{
+          const bin = atob("{b64}");
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          const url = URL.createObjectURL(new Blob([bytes], {{ type: "application/pdf" }}));
+          const a = document.getElementById("{anchor_id}");
+          if (a) a.href = url;
+        }})();
+        </script>
+        """,
+        height=46,
     )
 
 
