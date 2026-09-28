@@ -2478,7 +2478,7 @@ def main() -> None:
         else "Cognitive Radio Channel Selection under Jamming"
     )
     hero_sub = (
-        "Offline capture · frequency, modulation, bandwidth, class · rule baseline beside a separate classifier · track / recommend / hold"
+        "Compare a known capture with the measured threat record."
         if is_iq_view
         else "Channel simulation · measurement-based receiver · CR decision (rules / ML / hybrid) · adaptive hopping · power advice"
     )
@@ -2501,16 +2501,6 @@ def main() -> None:
         from iq_view import render_iq_analysis
 
         render_iq_analysis()
-        st.markdown(
-            """
-            <div class="footer-note">
-              IQ analysis is a separate mission from cognitive-radio channel selection.
-              The result is a threat record: track, recommend, or hold. No exciter is armed. No radiated RF.
-              Direction of arrival is not measured on a single channel.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
         return
 
     is_arch_view = st.session_state.ui_view == "System Architecture & Node View"
