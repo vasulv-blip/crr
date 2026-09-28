@@ -352,6 +352,31 @@ def train_emission_classifier(n_per_class: int = 40, seed: int = 7) -> EmissionC
     )
 
 
+def picture(iq: np.ndarray, fs_hz: float) -> dict:
+    """Spectrum and time-frequency image for the IQ screen. Frequencies in kHz."""
+    window = np.hanning(WINDOW)
+    frames: list[np.ndarray] = []
+    times: list[float] = []
+    for start in range(0, len(iq) - WINDOW + 1, HOP):
+        spec = np.fft.fftshift(np.fft.fft(iq[start : start + WINDOW] * window))
+        frames.append(np.abs(spec) ** 2)
+        times.append(1000.0 * (start + WINDOW / 2.0) / fs_hz)
+    power = np.vstack(frames)
+    freqs_khz = np.fft.fftshift(np.fft.fftfreq(WINDOW, d=1.0 / fs_hz)) / 1000.0
+    keep = (freqs_khz >= -45.0) & (freqs_khz <= 45.0)
+    freqs_khz = freqs_khz[keep]
+    power = power[:, keep]
+    floor = float(np.median(power))
+    spectrum_db = 10.0 * np.log10(np.maximum(power.mean(axis=0), 1e-12) / max(floor, 1e-12))
+    image_db = np.clip(10.0 * np.log10(np.maximum(power, 1e-12) / max(floor, 1e-12)), 0.0, 30.0)
+    return {
+        "freq_khz": freqs_khz.astype(float),
+        "spectrum_db": spectrum_db.astype(float),
+        "time_ms": np.asarray(times, dtype=float),
+        "image_db": image_db.astype(float),
+    }
+
+
 def gate(
     kind_rule: str,
     kind_ml: str,

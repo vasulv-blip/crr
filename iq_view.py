@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import html
 
+import altair as alt
+import pandas as pd
 import streamlit as st
 
-from cr_sim.iq_analysis import analyse_capture, synthesize, train_emission_classifier
+from cr_sim.iq_analysis import analyse_capture, picture, synthesize, train_emission_classifier
 
 SCENARIOS = {
     "Fixed tone": "FIXED",
@@ -146,6 +148,72 @@ def _css(dark: bool) -> str:
     """
 
 
+def _charts(picture_data: dict, known_khz: list[float], dark: bool) -> tuple[alt.Chart, alt.Chart]:
+    fg = "#e8eef3" if dark else "#102033"
+    grid = "#2a4256" if dark else "#d0dbe6"
+    spectrum = pd.DataFrame(
+        {"Frequency (kHz)": picture_data["freq_khz"], "Power (dB)": picture_data["spectrum_db"]}
+    )
+    spec = (
+        alt.Chart(spectrum)
+        .mark_area(line={"color": "#3d8bfd"}, color="rgba(61, 139, 253, 0.35)")
+        .encode(
+            x=alt.X("Frequency (kHz):Q", title="Frequency (kHz)"),
+            y=alt.Y("Power (dB):Q", title="Power (dB above noise)"),
+        )
+        .properties(height=220, title="Spectrum")
+    )
+    if known_khz:
+        rules = pd.DataFrame({"Frequency (kHz)": known_khz})
+        spec = spec + alt.Chart(rules).mark_rule(color="#e25b45", strokeDash=[4, 3]).encode(
+            x="Frequency (kHz):Q"
+        )
+    times = picture_data["time_ms"]
+    freqs = picture_data["freq_khz"]
+    image = picture_data["image_db"]
+    # Keep the strip readable: one row per FFT bin, one column per time step.
+    strip_rows = []
+    for t_i, t_ms in enumerate(times):
+        for f_i, f_khz in enumerate(freqs):
+            strip_rows.append(
+                {"Time (ms)": float(t_ms), "Frequency (kHz)": float(f_khz), "Power (dB)": float(image[t_i, f_i])}
+            )
+    strip = (
+        alt.Chart(pd.DataFrame(strip_rows))
+        .mark_rect()
+        .encode(
+            x=alt.X("Time (ms):Q", title="Time (ms)"),
+            y=alt.Y("Frequency (kHz):Q", title="Frequency (kHz)"),
+            color=alt.Color(
+                "Power (dB):Q",
+                title="Power (dB)",
+                scale=alt.Scale(scheme="inferno", domain=[0, 30]),
+            ),
+            tooltip=["Time (ms)", "Frequency (kHz)", "Power (dB)"],
+        )
+        .properties(height=220, title="Frequency over time")
+    )
+    themed = []
+    for chart in (spec, strip):
+        themed.append(
+            chart.configure(background="transparent")
+            .configure_axis(labelColor=fg, titleColor=fg, gridColor=grid, labelFontSize=11, titleFontSize=12)
+            .configure_title(color=fg, fontSize=14, anchor="start")
+            .configure_legend(labelColor=fg, titleColor=fg)
+            .configure_view(strokeWidth=0)
+        )
+    return themed[0], themed[1]
+
+
+def _spectrum_and_strip(picture_data: dict, known_khz: list[float], dark: bool) -> None:
+    spectrum, strip = _charts(picture_data, known_khz, dark)
+    left, right = st.columns(2)
+    with left:
+        st.altair_chart(spectrum, use_container_width=True)
+    with right:
+        st.altair_chart(strip, use_container_width=True)
+
+
 def render_iq_analysis() -> None:
     st.sidebar.markdown("### IQ capture")
     st.sidebar.caption(
@@ -166,7 +234,7 @@ def render_iq_analysis() -> None:
     run = st.sidebar.button("Analyse capture", type="primary", use_container_width=True, key="iq_run")
     signature = (scenario, seed, snr, threshold, protected_text.strip())
 
-    if run or st.session_state.get("iq_signature") != signature:
+    if run or st.session_state.get("iq_signature") != signature or "iq_picture" not in st.session_state:
         with st.spinner("Measuring this capture. The IQ classifier is trained once per session on a held-out split."):
             clf = _classifier()
             capture = synthesize(SCENARIOS[scenario], seed=seed, snr_db=snr)
@@ -179,6 +247,7 @@ def render_iq_analysis() -> None:
         st.session_state.iq_signature = signature
         st.session_state.iq_estimate = estimate
         st.session_state.iq_truth = capture.truth
+        st.session_state.iq_picture = picture(capture.iq, capture.fs_hz)
 
     estimate = st.session_state.iq_estimate
     truth = st.session_state.iq_truth
@@ -200,6 +269,8 @@ def render_iq_analysis() -> None:
         st.error("The rule baseline and the IQ classifier disagree. The gate holds.")
 
     dark = st.session_state.get("theme_mode", "Dark") == "Dark"
+    _spectrum_and_strip(st.session_state.iq_picture, truth.frequencies_khz, dark)
+
     hops = _stable_hops(estimate.hop_rows)
     known_freqs = [f"{value:.2f}" for value in truth.frequencies_khz]
     est_freqs = [f"{row['frequency_khz']:.2f}" for row in hops]
