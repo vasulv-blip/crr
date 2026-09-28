@@ -98,6 +98,22 @@ def clause(pdf: PDF, num: str, text: str, bold_lead: bool = False):
     pdf.ln(0.6)
 
 
+def figure(pdf: PDF, path: Path, caption: str):
+    """Place a screenshot and a one-line caption. Start a new page if the image would be cramped."""
+    if not path.is_file():
+        clause(pdf, "-", f"Figure missing: {path.name}")
+        return
+    usable = pdf.w - pdf.l_margin - pdf.r_margin
+    if pdf.get_y() > 150:
+        pdf.add_page()
+    pdf.image(str(path), x=pdf.l_margin, w=usable)
+    pdf.ln(1)
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_text_color(*MUTED)
+    pdf.multi_cell(0, 4.5, clean(caption))
+    pdf.ln(2)
+
+
 def build():
     pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=16)
@@ -290,6 +306,114 @@ def build():
     clause(pdf, "15.3", "ML not trained message -> Apply configuration or Reset simulation.")
     clause(pdf, "15.4", "Need a clean demo again -> Silence / Clear jam, then Reset simulation.")
     clause(pdf, "15.5", "Local start command (if running on a PC): python -m streamlit run app.py then open http://localhost:8501")
+
+    # ------------------------------------------------------------------
+    h1(pdf, "16. IQ Analysis screen")
+    clause(
+        pdf,
+        "16.1",
+        "IQ means In-phase and Quadrature. A radio sample is stored as two numbers at each instant: the in-phase part and the quadrature part, ninety degrees apart. Together they are one complex sample. This screen reads a short recording of those samples. It does not retune our transmitter, and it does not arm an exciter.",
+    )
+    clause(
+        pdf,
+        "16.2",
+        "How to open it: after login, in the sidebar under Display View, select IQ Analysis. The other two views remain the cognitive-radio demonstration. This view is a separate mission: describe the emission in the recording.",
+    )
+    clause(
+        pdf,
+        "16.3",
+        "Sidebar controls. Known capture chooses the recording: Fixed tone (one steady frequency), 1 ms burst (energy for about one millisecond), or Hopper (the tone steps through 6, 14, 22 and 30 kHz). Capture seed repeats the same recording. True SNR (dB) is the signal-to-noise ratio written into that recording. Confidence threshold is the minimum score required before a recommendation is allowed. Protected frequencies (kHz) is a comma-separated list; a match within 2 kHz forces HOLD. Analyse capture runs the measurement again.",
+    )
+    clause(
+        pdf,
+        "16.4",
+        "The pictures below are the Hopper example. Read the top of the screen first, then the Threat Record, then the Hop Set and Bursts.",
+    )
+    figure(
+        pdf,
+        BASE / "docs" / "figures" / "iq_analysis_screen_top.png",
+        "Figure 1. IQ Analysis, Hopper example: decision banner, four summary boxes, spectrum, frequency over time, and the Threat Record.",
+    )
+    clause(
+        pdf,
+        "16.5",
+        "Green RECOMMEND banner. The class from the rules and the class from the classifier agree, and the confidence is above the threshold. The banner states that nothing is transmitted. RECOMMEND here means 'write down this emission'. It does not mean 'transmit'.",
+    )
+    clause(
+        pdf,
+        "16.6",
+        "If the banner is amber HOLD, do not treat the row as a firm identification. HOLD appears when the two class answers disagree, when confidence is below the threshold, or when the frequency is on the protected list. If the banner is blue TRACK, no emission rose clearly above the noise.",
+    )
+    clause(
+        pdf,
+        "16.7",
+        "Rule class is the answer from energy, bandwidth, and how often the frequency changes. No neural net is used for this box. In the picture it says HOPPER because several frequencies are occupied for most of the recording.",
+    )
+    clause(
+        pdf,
+        "16.8",
+        "IQ classifier is a separate small network trained only on these three synthetic families. The number in brackets (0.99 in the picture) is its confidence in this one recording. It is not the cognitive-radio channel network used on the other screens.",
+    )
+    clause(
+        pdf,
+        "16.9",
+        "Held-out test accuracy (1.00 in the picture) is the score on synthetic recordings that were not used to train that small network. A perfect score means these three families are easy to tell apart. It does not mean a field modulation classifier is finished.",
+    )
+    clause(
+        pdf,
+        "16.10",
+        "Direction of arrival says 'not measured' on purpose. One recording has no antenna array, so the screen cannot give a bearing.",
+    )
+    clause(
+        pdf,
+        "16.11",
+        "Spectrum (left plot). Horizontal axis is frequency in kHz. Vertical axis is power above the noise, in dB. Each hump is energy at that frequency. The red dashed lines are the known frequencies of this capture (6, 14, 22 and 30 kHz). The measured humps sit on those lines, within one frequency bin. A fixed tone shows one hump. A hopper shows one hump per frequency it visited.",
+    )
+    clause(
+        pdf,
+        "16.12",
+        "Frequency over time (right plot). Horizontal axis is time in milliseconds, from 0 to about 40. Vertical axis is frequency in kHz. Colour is power: brighter colour is stronger energy, dark purple is the noise floor. A fixed tone is one bright horizontal line. A hopper is a staircase, stepping from one frequency to the next. A 1 ms burst is a short bright mark, with the rest of the time dark. Hover a cell to read time, frequency, and power. A dark cell, such as 43.75 kHz at the end of the recording, is noise, not a hop.",
+    )
+    clause(
+        pdf,
+        "16.13",
+        "Threat Record compares the known capture with the estimate. Known Capture is the truth we wrote into the file. Estimate is what the measurement recovered. Class should match (HOPPER). Frequency tags are the same set, reported on a 1.56 kHz grid, so 6.00 appears as 6.25, 22.00 as 21.88, and 30.00 as 29.69. One-hit noise bins are left off those tags.",
+    )
+    clause(
+        pdf,
+        "16.14",
+        "Bandwidth (Hz) is how wide each tone looks. The known value, 1562 Hz, is one frequency bin. The estimate, 3125 Hz, is about two bins, which is normal for a short window. Modulation 'unmodulated tone' means a single steady tone, not a voice or a data constellation. SNR (dB) is signal-to-noise ratio: 15.0 was written in, 14.1 was measured. Start and Duration say the energy runs for the whole 40 ms capture. DOA is Not measured on both sides.",
+    )
+    clause(
+        pdf,
+        "16.15",
+        "The line under the table is the recommendation record: one frequency, one bandwidth, and a time span. In the picture that is 21.88 kHz, 3125 Hz, from 0.00 ms for 39.68 ms. It is the strongest measured tone, written down for a scientist. Nothing is transmitted.",
+    )
+    figure(
+        pdf,
+        BASE / "docs" / "figures" / "iq_analysis_screen_bottom.png",
+        "Figure 2. Hop Set, Bursts, and the note 'About this measurement', for the same Hopper capture.",
+    )
+    clause(
+        pdf,
+        "16.16",
+        "Hop Set lists each frequency that was occupied more than once. Hits is how many time slices fell on that frequency. Dwell (ms) is how long the energy stayed there, added up. Last (ms) is the latest time that frequency was seen. The four rows are the four hopper frequencies, on the 1.56 kHz grid. The table is capped at 1000 frequencies. Numbers are right-aligned so the decimals line up.",
+    )
+    clause(
+        pdf,
+        "16.17",
+        "Bursts lists uninterrupted stretches of energy. For this hopper the transmitter never goes quiet, so there is one row from 0.00 ms for 39.68 ms. The frequency on that row is only the first slice, not the whole hop list. Use the Hop Set, not this single burst row, to see every frequency. For the '1 ms burst' capture you should instead see a short duration, about 1 ms, and a quiet recording on either side.",
+    )
+    clause(
+        pdf,
+        "16.18",
+        "About this measurement repeats the limits in one place: synthetic training only, held-out score, not the cognitive-radio network, 1.56 kHz grid, red lines are the known frequencies, one-hit bins are omitted, no direction of arrival, and no exciter.",
+    )
+    clause(
+        pdf,
+        "16.19",
+        "What to try while simulating. Select Fixed tone and confirm one hump and one frequency tag. Select 1 ms burst and confirm a short mark in time and a duration near 1 ms. Select Hopper and confirm four humps and four hop-set rows. Type one of the known frequencies into Protected frequencies and confirm the banner changes to HOLD.",
+    )
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     pdf.output(str(OUT))
