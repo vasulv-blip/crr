@@ -359,6 +359,6 @@ def render_iq_analysis() -> None:
             "The IQ classifier is trained only on these synthetic captures, and the accuracy figure is from a held-out split. "
             "It is not the cognitive-radio channel network. "
             "A high score means these three synthetic families are easy to separate. It does not mean a field modulation classifier is finished. "
-            "Frequency is reported on a 1.56 kHz grid. One-hit bins are left out of the frequency tags so noise splatter is not listed as a hop. "
+            "Frequency is reported on a 1.56 kHz grid. Red lines on the spectrum are the known frequencies in this capture. One-hit bins are left out of the frequency tags so noise splatter is not listed as a hop. "
             "Direction of arrival is not measured on a single channel. No exciter is armed."
         )
