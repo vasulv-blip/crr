@@ -2416,8 +2416,12 @@ def main() -> None:
 
         st.markdown("---")
         st.markdown("### Display View")
-        view_opts = ["System Architecture & Node View", "Operator Spectrum View"]
-        side_idx = 0 if st.session_state.ui_view == view_opts[0] else 1
+        view_opts = [
+            "System Architecture & Node View",
+            "Operator Spectrum View",
+            "IQ Analysis",
+        ]
+        side_idx = view_opts.index(st.session_state.ui_view) if st.session_state.ui_view in view_opts else 0
         side_view = st.radio(
             "Interface layout",
             options=view_opts,
@@ -2467,13 +2471,24 @@ def main() -> None:
         else ""
     )
 
+    is_iq_view = st.session_state.ui_view == "IQ Analysis"
+    hero_title = (
+        "IQ Analysis — Threat Record"
+        if is_iq_view
+        else "Cognitive Radio Channel Selection under Jamming"
+    )
+    hero_sub = (
+        "Offline capture · frequency, modulation, bandwidth, class · rule baseline beside a separate classifier · track / recommend / hold"
+        if is_iq_view
+        else "Channel simulation · measurement-based receiver · CR decision (rules / ML / hybrid) · adaptive hopping · power advice"
+    )
     st.markdown(
         f"""
         <div class="hero">
           <div class="hero-content">
-            <div class="hero-title">Cognitive Radio Channel Selection under Jamming</div>
+            <div class="hero-title">{hero_title}</div>
             <div class="hero-sub">
-              Channel simulation · measurement-based receiver · CR decision (rules / ML / hybrid) · adaptive hopping · power advice
+              {hero_sub}
             </div>
           </div>
           {logo_brand_html}
@@ -2481,6 +2496,22 @@ def main() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+    if is_iq_view:
+        from iq_view import render_iq_analysis
+
+        render_iq_analysis()
+        st.markdown(
+            """
+            <div class="footer-note">
+              IQ analysis is a separate mission from cognitive-radio channel selection.
+              The result is a threat record: track, recommend, or hold. No exciter is armed. No radiated RF.
+              Direction of arrival is not measured on a single channel.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        return
 
     is_arch_view = st.session_state.ui_view == "System Architecture & Node View"
 
